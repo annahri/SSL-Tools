@@ -1,0 +1,17 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<div class="row">
+    <div class="column column-80 column-offset-10">
+    <label>Certificate Signing Request</label>
+    <textarea rows='30' cols='70' readonly>{{ csr }}</textarea><br>
+
+    <label>Private Key</label>
+    <textarea rows='30' cols='70' readonly>{{ pkey }}</textarea>
+    <br>
+    <a class="button button-menu button-outline" href='{% url 'generate-csr' %}'>Generate new</a>
+    </div>
+</div>
+
+{% endblock %}

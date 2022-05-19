@@ -1,0 +1,25 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="column center">
+        <h3>Generate CSR</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="column column-50 column-offset-25">
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <div class="row">
+                <div class="column">
+                    <input class="button button-menu" type="submit" value="Generate">
+                </div>
+                <div class="column">
+                    <input class="button button-menu button-outline" type=reset value="Reset">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<form action="#" method="post">
+    {% csrf_token %}
+    <div>
+        <label>Common Name</label><br>
+        <input type="text" name="cn">
+    </div>
+    <div>
+        <label>Country</label><br>
+        <input type="text" name="country">
+    </div>
+    <div>
+        <label>State</label><br>
+        <input type="text" name="state">
+    </div>
+    <div>
+        <label>Localty</label><br>
+        <input type="text" name="localty">
+    </div>
+    <div>
+        <label>Organization</label><br>
+        <input type="text" name="org">
+    </div>
+    <div>
+        <label>Organizational Unit</label><br>
+        <input type="text" name="ou">
+    </div>
+    <div>
+        <label>Keysize</label>
+        <label>
+            <input type="radio" name="keysize" value="2048">
+            2048
+        </label>
+        <label>
+            <input type="radio" name="keysize" value="4096">
+            4096
+        </label>
+    </div>
+    <div>
+        <input type="submit" value="Generate">
+        <button type="reset">Reset</button>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<div class="row">
+    <div class="column center">
+        <h3>Decode CSR</h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="column column-60 column-offset-20">
+    {% if page == 'result' %}
+        <dl>
+            {% for key, value in result.items %}
+            <dt>{{ key }}: {{ value }}</dt>
+            {% endfor %}
+        </dl>
+        <a class="button button-menu button-outline" href='{% url 'decode-csr' %}'>Back</a>
+    {% else %}
+    <form action="" method="post" id='csr-box'>
+        {% csrf_token %}
+        <textarea cols='70' rows='20' form='csr-box' name='csr' placeholder='-----BEGIN CERTIFICATE REQUEST-----'></textarea><br>
+        <input class="button button-menu" type="submit" value="Decode" />
+        <input class="button button-menu button-outline" type="reset" value="Reset" />
+    </form>
+    {% endif %}
+    </div>
+</div>
+
+{% endblock %}

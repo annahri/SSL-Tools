@@ -1,0 +1,19 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="column column-50 column-offset-25">
+        <a class="button button-menu" href='{% url 'generate-csr' %}'>Generate CSR</a>
+    </div>
+</div>
+<div class="row">
+    <div class="column column-50 column-offset-25">
+        <a class="button button-menu" href='{% url 'decode-csr' %}'>Decode CSR</a>
+    </div>
+</div>
+<div class="row">
+    <div class="column column-50 column-offset-25">
+        <a class="button button-menu" href='{% url 'verify-ssl' %}'>Verify SSL Cert</a>
+    </div>
+</div>
+{% endblock %}
