@@ -60,8 +60,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVKEY }}
           script: |
             workers=$(( (`grep -c '^processor' /proc/cpuinfo` * 2 ) + 1 ))
-            sed "s/APP_PATH/${{ secret.APP_PATH }}/; s/WORKERS/$workers/" ${{ secret.APP_PATH }}/etc/supervisor/conf.d/ssl-tools_gunicorn.conf | sudo tee /etc/supervisor/conf.d/ssl-tools_gunicorn.conf        
-            sed "s/APP_PATH/${{ secret.APP_PATH }}/" ${{ secret.APP_PATH }}/etc/caddy/sites-available/ssl-tools.ngelinux.my.id | sudo tee /etc/caddy/sites-available/ssl-tools.ngelinux.my.id
+            sed "s/APP_PATH/${{ secrets.APP_PATH }}/; s/WORKERS/$workers/" ${{ secrets.APP_PATH }}/etc/supervisor/conf.d/ssl-tools_gunicorn.conf | sudo tee /etc/supervisor/conf.d/ssl-tools_gunicorn.conf        
+            sed "s/APP_PATH/${{ secrets.APP_PATH }}/" ${{ secrets.APP_PATH }}/etc/caddy/sites-available/ssl-tools.ngelinux.my.id | sudo tee /etc/caddy/sites-available/ssl-tools.ngelinux.my.id
             if sudo supervisorctl avail | grep -q 'ssl-tools_gunicorn'; then
               sudo supervisorctl update ssl-tools_gunicorn
             else
