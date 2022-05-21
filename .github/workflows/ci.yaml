@@ -35,6 +35,7 @@ jobs:
           ARGS: >-
             -rtlgoDzvO
             --exclude='.git'
+            --exclude='.github'
             --rsync-path='sudo mkdir -p ${{ secrets.APP_PATH }} && rsync'
           REMOTE_HOST: ${{ secrets.SSH_HOST }}
           REMOTE_USER: ${{ secrets.SSH_USER }}
