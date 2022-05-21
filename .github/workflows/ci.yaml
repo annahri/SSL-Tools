@@ -51,6 +51,18 @@ jobs:
             cd ${{ secrets.APP_PATH }}
             pipenv install --deploy
 
+      - name: Configure Environment Variables
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVKEY }}
+          script: |
+            cd ${{ secrets.APP_PATH }}/src/
+            echo "DEBUG=${{ secrets.DJANGO_DEBUG }}" >> .env
+            echo "SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
+            echo "ALLOWED_HOSTS=ssh-tools.ngelinux.my.id" >> .env
+            echo "CSRF_TRUSTED_ORIGINS=https://ssh-tools.ngelinux.my.id" >> .env
 
       - name: Configure supervisor and caddy
         uses: appleboy/ssh-action@master
