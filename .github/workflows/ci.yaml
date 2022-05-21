@@ -59,10 +59,11 @@ jobs:
           password: ${{ secrets.SSH_PASS }}
           script: |
             cd ${{ secrets.APP_PATH }}/src/
+            rm -f .env
             echo "DEBUG=${{ secrets.DJANGO_DEBUG }}" >> .env
             echo "SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
-            echo "ALLOWED_HOSTS=ssh-tools.ngelinux.my.id" >> .env
-            echo "CSRF_TRUSTED_ORIGINS=https://ssh-tools.ngelinux.my.id" >> .env
+            echo "ALLOWED_HOSTS=ssl-tools.ngelinux.my.id" >> .env
+            echo "CSRF_TRUSTED_ORIGINS=https://ssl-tools.ngelinux.my.id" >> .env
 
       - name: Configure supervisor and caddy
         uses: appleboy/ssh-action@master
@@ -79,3 +80,20 @@ jobs:
               sudo supervisorctl add ssl-tools_gunicorn
             fi
             sudo systemctl restart caddy
+
+      - name: Check supervisor
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASS }}
+          script: |
+            sudo supervisorctl status ssl-tools_gunicorn
+
+  check:
+    needs: [deploy]
+    steps:
+      - name: Verify deployment result
+        uses: wei/curl@master
+        with:
+          args: https://ssl-tools.ngelinux.my.id

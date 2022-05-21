@@ -1,5 +1,5 @@
 ssl-tools.ngelinux.my.id:80 {
-    root * APP_PATH/src/
+    root * APP_PATHsrc/
     @notStatic {
         not {
             path /static/*
