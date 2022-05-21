@@ -1,0 +1,11 @@
+ssl-tools.ngelinux.my.id:80 {
+    root * APP_PATH/src/
+    @notStatic {
+        not {
+            path /static/*
+        }
+    }
+
+    reverse_proxy @notStatic 127.0.0.1:8000
+    file_server
+}

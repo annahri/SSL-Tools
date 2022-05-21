@@ -1,0 +1,70 @@
+name: Django CI/CD Workflow
+
+# Workflow triggers
+on:
+  # Any pushes to the following branches
+  push:
+    branches:
+      - main
+      - devel
+
+  # Any pull request on the following branches
+  pull_request:
+    branches:
+      - main
+      - devel
+
+# Workflow jobs definitions
+jobs:
+  #  tests_job:
+  #  this will be implemented later
+
+  # Deploy
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Deploy
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVKEY }}
+          ARGS: >-
+            -rtlgoDzvO
+            --exclude='.git'
+            --rsync-path='sudo mkdir -p ${{ secrets.APP_PATH }} && rsync'
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USER }}
+          TARGET: ${{ secrets.APP_PATH }}
+
+      # No python3.8 binary check for now, might be added later
+      - name: Install requirements
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVKEY }}
+          script: |
+            cd ${{ secrets.APP_PATH }}
+            pipenv install --deploy
+
+
+      - name: Configure supervisor and caddy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVKEY }}
+          script: |
+            workers=$(( (`grep -c '^processor' /proc/cpuinfo` * 2 ) + 1 ))
+            sed "s/APP_PATH/${{ secret.APP_PATH }}/; s/WORKERS/$workers/" ${{ secret.APP_PATH }}/etc/supervisor/conf.d/ssl-tools_gunicorn.conf | sudo tee /etc/supervisor/conf.d/ssl-tools_gunicorn.conf        
+            sed "s/APP_PATH/${{ secret.APP_PATH }}/" ${{ secret.APP_PATH }}/etc/caddy/sites-available/ssl-tools.ngelinux.my.id | sudo tee /etc/caddy/sites-available/ssl-tools.ngelinux.my.id
+            if sudo supervisorctl avail | grep -q 'ssl-tools_gunicorn'; then
+              sudo supervisorctl update ssl-tools_gunicorn
+            else
+              sudo supervisorctl add ssl-tools_gunicorn
+            fi
+            sudo systemctl restart caddy
