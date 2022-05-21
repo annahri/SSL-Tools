@@ -46,7 +46,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVKEY }}
+          password: ${{ secrets.SSH_PASS }}
           script: |
             cd ${{ secrets.APP_PATH }}
             pipenv install --deploy
@@ -56,7 +56,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVKEY }}
+          password: ${{ secrets.SSH_PASS }}
           script: |
             cd ${{ secrets.APP_PATH }}/src/
             echo "DEBUG=${{ secrets.DJANGO_DEBUG }}" >> .env
@@ -69,7 +69,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVKEY }}
+          password: ${{ secrets.SSH_PASS }}
           script: |
             workers=$(( (`grep -c '^processor' /proc/cpuinfo` * 2 ) + 1 ))
             sed "s/APP_PATH/${{ secrets.APP_PATH }}/; s/WORKERS/$workers/" ${{ secrets.APP_PATH }}/etc/supervisor/conf.d/ssl-tools_gunicorn.conf | sudo tee /etc/supervisor/conf.d/ssl-tools_gunicorn.conf        
