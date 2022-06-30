@@ -1,11 +1,8 @@
-from django.shortcuts import render, redirect
+from . import csrtools
+from .forms import CSRForm
+from django.shortcuts import render
 from django.http import HttpResponse
 
-from .forms import CSRForm
-from .csrtools import create_csr, decode_csr
-
-
-# Create your views here.
 def home(request):
     return render(request, 'base/home.html')
 
@@ -13,32 +10,36 @@ def form(request):
     context = {'form'}
     return render(request,'base/forms.html', context)
 
-def generateCSR(request):
+def generate_csr(request):
     if request.method == 'POST':
         form = CSRForm(request.POST)
-        if form.is_valid():
-            pkey, csr = create_csr(
-                form.cleaned_data['common_name'],
-                form.cleaned_data['country'],
-                form.cleaned_data['state'],
-                form.cleaned_data['localty'],
-                form.cleaned_data['organization'],
-                form.cleaned_data['organizational_unit'],
-                form.cleaned_data['key_size']
-            )
-            context = {'pkey': pkey.decode('utf-8').rstrip(), 'csr': csr.decode('utf-8').rstrip()} 
-            return render(request, 'base/success.html', context)
+
+        if not form.is_valid():
+            raise Exception
+
+        csr = csrtools.CSR(
+            form.cleaned_data['common_name'],
+            form.cleaned_data['country'],
+            form.cleaned_data['state'],
+            form.cleaned_data['localty'],
+            form.cleaned_data['organization'],
+            form.cleaned_data['organizational_unit'],
+            form.cleaned_data['key_size']
+        )
+
+        context = {'pkey': csr.get_privkey().rstrip(), 'csr': csr.get_csr().rstrip()} 
+        return render(request, 'base/success.html', context)
     else:
         form = CSRForm()
         context = {'form': form}
 
     return render(request, 'base/generate-csr.html', context)
 
-def decodeCSR(request):    
+def decode_csr(request):    
     if request.method == 'POST':
         page = 'result'
         csr = request.POST.get('csr')
-        result, err = decode_csr(csr)
+        result, err = csrtools.decode_csr(csr)
         
         if err is not None:
             return HttpResponse('Error occurred. It might be an invalid CSR format.')
