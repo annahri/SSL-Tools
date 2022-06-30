@@ -9,14 +9,20 @@ class CSR:
     localty: str
     organization: str
     organizational_unit: str
-    _private_key: str = field(init=False)
-    _csr: str = field(init=False)
+    _keypair: crypto.PKey = field(init=False)
     key_size: int = 2048
 
     def __post_init__(self) -> None:
         key = crypto.PKey()
         key.generate_key(crypto.TYPE_RSA, int(self.key_size))
+        self._keypair = key
 
+    @property
+    def private_key(self) -> str:
+        return crypto.dump_privatekey(crypto.FILETYPE_PEM, self._keypair).decode('utf-8')
+
+    @property
+    def request(self) -> str:
         req = crypto.X509Req()
         req.get_subject().CN = self.common_name
         req.get_subject().C = self.country
@@ -25,26 +31,15 @@ class CSR:
         req.get_subject().O = self.organization
         req.get_subject().OU = self.organizational_unit
 
-        req.set_pubkey(key)
-        req.sign(key, 'sha256')
+        req.set_pubkey(self._keypair)
+        req.sign(self._keypair, 'sha256')
+        return crypto.dump_certificate_request(crypto.FILETYPE_PEM, req).decode('utf-8')
 
-        self._private_key = crypto.dump_privatekey(crypto.FILETYPE_PEM, key).decode('utf-8')
-        self._csr = crypto.dump_certificate_request(crypto.FILETYPE_PEM, req).decode('utf-8')
-
-    def get_privkey(self) -> str:
-        return self._private_key
-
-    def get_csr(self) -> str:
-        return self._csr
-
-def decode_csr(csr):
+def decode_csr(csr) -> dict:
     result = {}
-    err = None
-
     try:
         req = crypto.load_certificate_request(crypto.FILETYPE_PEM, csr)
     except Exception as e:
-        err = e
         print(type(e))
     else:
         subject = req.get_subject()
@@ -57,4 +52,4 @@ def decode_csr(csr):
         result.update({"Organization": components[b'O'].decode('utf-8')})
         result.update({"Organizational Unit": components[b'OU'].decode('utf-8')})
 
-    return result, err
+    return result

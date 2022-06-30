@@ -27,7 +27,7 @@ def generate_csr(request):
             form.cleaned_data['key_size']
         )
 
-        context = {'pkey': csr.get_privkey().rstrip(), 'csr': csr.get_csr().rstrip()} 
+        context = {'pkey': csr.private_key.rstrip(), 'csr': csr.request.rstrip()} 
         return render(request, 'base/success.html', context)
     else:
         form = CSRForm()
@@ -39,9 +39,9 @@ def decode_csr(request):
     if request.method == 'POST':
         page = 'result'
         csr = request.POST.get('csr')
-        result, err = csrtools.decode_csr(csr)
+        result = csrtools.decode_csr(csr)
         
-        if err is not None:
+        if not result:
             return HttpResponse('Error occurred. It might be an invalid CSR format.')
 
         context = { 'result': result, 'page': page }
