@@ -1,3 +1,4 @@
+import pytest
 from .csrtools import decode_csr
 
 data = '''-----BEGIN CERTIFICATE REQUEST-----
@@ -26,19 +27,23 @@ kOcmvqlVGuujvI1YMl0uVlX7fjmVk7f4R0Pw
 -----END CERTIFICATE REQUEST-----'''
 
 def test_csr_common_name():    
-    assert decode_csr(bytes(data, 'utf-8'))['Common Name'] == 'www.example.com'
+    assert decode_csr(data)['Common Name'] == 'www.example.com'
 
 def test_csr_country():    
-    assert decode_csr(bytes(data, 'utf-8'))['Country'] == 'ID'
+    assert decode_csr(data)['Country'] == 'ID'
 
 def test_csr_state():    
-    assert decode_csr(bytes(data, 'utf-8'))['State'] == 'East Java'
+    assert decode_csr(data)['State'] == 'East Java'
 
 def test_csr_localty():    
-    assert decode_csr(bytes(data, 'utf-8'))['Localty'] == 'Surabaya'
+    assert decode_csr(data)['Localty'] == 'Surabaya'
 
 def test_csr_organization():     
-    assert decode_csr(bytes(data, 'utf-8'))['Organization'] == 'Example Inc.'
+    assert decode_csr(data)['Organization'] == 'Example Inc.'
 
 def test_csr_organizational_unit():    
-    assert decode_csr(bytes(data, 'utf-8'))['Organizational Unit'] == 'IT'
+    assert decode_csr(data)['Organizational Unit'] == 'IT'
+
+def test_incorrect_csr_format():
+    with pytest.raises(ValueError):
+        decode_csr(data_incorrect)

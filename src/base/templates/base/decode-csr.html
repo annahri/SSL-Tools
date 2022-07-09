@@ -13,7 +13,7 @@
     {% if page == 'result' %}
         <dl>
             {% for key, value in result.items %}
-            <dt>{{ key }}: {{ value }}</dt>
+            <dt><strong>{{ key }}</strong>: {{ value }}</dt>
             {% endfor %}
         </dl>
         <a class="button button-menu button-outline" href='{% url 'decode-csr' %}'>Back</a>
