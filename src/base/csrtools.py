@@ -39,8 +39,8 @@ def decode_csr(csr) -> dict:
     result = {}
     try:
         req = crypto.load_certificate_request(crypto.FILETYPE_PEM, csr)
-    except Exception as e:
-        print(type(e))
+    except Exception:
+        raise ValueError
     else:
         subject = req.get_subject()
         components = dict(subject.get_components())
