@@ -1,0 +1,1 @@
+local ansible_host=192.168.122.200 ansible_user=annahri ansible_password=bismillah

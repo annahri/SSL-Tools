@@ -1,0 +1,23 @@
+---
+- hosts: all
+  become: true
+  gather_facts: true
+  vars:
+    python_version: 3.8
+    app_path: /srv/apps/ssl-tools/
+    domain_name: ssl-tools.annahri.lan
+    envs:
+      - "DEBUG=false"
+      - "ALLOWED_HOSTS={{ domain_name }},127.0.0.1"
+      - "SECRET_KEY=super_secret_key"
+      - "CSRF_TRUSTED_ORIGINS=https://{{ domain_name }}"
+
+  tasks:
+    - name: Create apps user
+      ansible.builtin.user:
+        name: apps
+        comment: Apps user
+
+    - include_tasks: tasks/packages.yaml
+    - include_tasks: tasks/deploy.yaml
+    - include_tasks: tasks/tests.yaml

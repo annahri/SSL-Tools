@@ -9,11 +9,42 @@ on:
 
 # Workflow jobs definitions
 jobs:
-  #  tests_job:
-  #  this will be implemented later
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install pipenv
+        run: |
+          python -m pip install --upgrade pipenv wheel
+
+      - id: cache-pipenv
+        uses: actions/cache@v1
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
+        run: |
+          pipenv install --deploy
+
+      - name: Run tests
+        run: |
+          pipenv run test -v
 
   # Deploy
-  deploy:
+  deploy: 
+    needs: test
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' }}
 
@@ -21,73 +52,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       
-      - name: Deploy
-        uses: easingthemes/ssh-deploy@main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVKEY }}
-          ARGS: >-
-            -rtlgoDzvO
-            --exclude='.git'
-            --exclude='.github'
-            --rsync-path='sudo mkdir -p ${{ secrets.APP_PATH }} && rsync'
-          REMOTE_HOST: ${{ secrets.SSH_HOST }}
-          REMOTE_USER: ${{ secrets.SSH_USER }}
-          TARGET: ${{ secrets.APP_PATH }}
-
-      # No python3.8 binary check for now, might be added later
-      - name: Install requirements
-        uses: appleboy/ssh-action@master
+      - name: Run Ansible
+        uses: dawidd6/action-ansible-playbook@v2
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASS }}
-          script: |
-            cd ${{ secrets.APP_PATH }}
-            pipenv install --deploy
-
-      - name: Configure Environment Variables
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASS }}
-          script: |
-            cd ${{ secrets.APP_PATH }}/src/
-            rm -f .env
-            echo "DEBUG=${{ secrets.DJANGO_DEBUG }}" >> .env
-            echo "SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
-            echo "ALLOWED_HOSTS=ssl-tools.ngelinux.my.id" >> .env
-            echo "CSRF_TRUSTED_ORIGINS=https://ssl-tools.ngelinux.my.id" >> .env
-
-      - name: Configure supervisor and caddy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASS }}
-          script: |
-            sed 's|APP_PATH|${{ secrets.APP_PATH }}|; s|WORKERS|3|' ${{ secrets.APP_PATH }}/etc/supervisor/conf.d/ssl-tools_gunicorn.conf | sudo tee /etc/supervisor/conf.d/ssl-tools_gunicorn.conf        
-            sed 's|APP_PATH|${{ secrets.APP_PATH }}|' ${{ secrets.APP_PATH }}/etc/caddy/sites-available/ssl-tools.ngelinux.my.id | sudo tee /etc/caddy/sites-available/ssl-tools.ngelinux.my.id
-            if sudo supervisorctl avail | grep -q 'ssl-tools_gunicorn'; then
-              sudo supervisorctl update ssl-tools_gunicorn
-            else
-              sudo supervisorctl add ssl-tools_gunicorn
-            fi
-            sudo systemctl restart caddy
-
-      - name: Check supervisor
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASS }}
-          script: |
-            sudo supervisorctl status ssl-tools_gunicorn
-
-  check:
-    needs: [deploy]
-    steps:
-      - name: Verify deployment result
-        uses: wei/curl@master
-        with:
-          args: https://ssl-tools.ngelinux.my.id
+          playbook: main.yaml
+          directory: ansible/
+          key: ${{ secrets.SSH_PRIVKEY }}
+          inventory: |
+            [all]
+            app_server ansible_alias=${{ secrets.SSH_HOST }} ansible_user=${{ secrets.SSH_USER }}

@@ -1,0 +1,24 @@
+- name: Update Packages (Ubuntu)
+  when: ansible_facts['distribution'] == "Ubuntu"
+  ansible.builtin.apt: update_cache=yes
+
+- name: Check and Install Python {{ python_version }} if it doesn't exist yet
+  block:
+    - name: Make sure Python {{ python_version }} is present
+      ansible.builtin.command: which python{{ python_version }}
+      changed_when: false
+
+    - include_tasks: install_python.yaml
+
+    - name: Install Pipenv
+      ansible.builtin.pip:
+        name: pipenv
+        executable: pip3
+
+- name: Install NGINX (Ubuntu)
+  when: ansible_facts['distribution'] == "Ubuntu"
+  ansible.builtin.apt: name=nginx state=present
+
+- name: Install NGINX (Rocky)
+  when: ansible_facts['distribution'] == "Rocky"
+  ansible.builtin.dnf: name=nginx state=present
