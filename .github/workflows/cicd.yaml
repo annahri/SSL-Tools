@@ -54,6 +54,10 @@ jobs:
       
       - name: Run Ansible
         uses: dawidd6/action-ansible-playbook@v2
+        env:
+          DEBUG: false
+          DOMAIN_NAME: ssl-tools.ngelinux.my.id
+          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
         with:
           playbook: main.yaml
           directory: ansible/
