@@ -1,0 +1,33 @@
+- name: Add deadsnakes PPA (Ubuntu)
+  when: ansible_facts['distribution'] == 'Ubuntu'
+  become: true
+  ansible.builtin.apt_repository:
+    repo: 'ppa:deadsnakes/ppa'
+
+- name: Install Python {{ python_version }} (Ubuntu)
+  when: ansible_facts['distribution'] == 'Ubuntu'
+  ansible.builtin.apt: name=python{{ python_version }}-dev state=present
+  become: true
+
+- name: Install Python {{ python_version }} (Rocky)
+  when: ansible_facts['distribution'] == 'Rocky'
+  ansible.builtin.yum: name=python{{ python_version | split('.') | join('') }} state=present
+  become: true
+
+- name: Check if PIP is present
+  ansible.builtin.command: which pip
+  register: pip_installed
+  ignore_errors: true
+  check_mode: false
+  changed_when: false
+
+- name: Getting get-pip.py
+  when: pip_installed.rc != 0
+  ansible.builtin.get_url:
+    url: https://bootstrap.pypa.io/get-pip.py
+    dest: /tmp/get-pip.py
+    mode: 0400
+
+- name: Installing PIP
+  when: pip_installed.rc != 0
+  ansible.builtin.command: python{{ python_version }} /tmp/get-pip.py

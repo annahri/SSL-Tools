@@ -51,3 +51,6 @@ def decode_csr(request):
 
 def verifySSL(request):
     return render(request, 'base/verify-ssl.html')
+
+def get_status(request):
+    return HttpResponse('mantap')

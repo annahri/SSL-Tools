@@ -1,0 +1,15 @@
+[Unit]
+Description=ssl-tools service
+
+[Service]
+User=apps
+Group=apps
+WorkingDirectory={{ app_path }}src
+{% for env in envs %}
+Environment={{ env }}
+{% endfor %}
+ExecStart=/usr/local/bin/pipenv run gunicorn --workers=3 ssl-tools.wsgi
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

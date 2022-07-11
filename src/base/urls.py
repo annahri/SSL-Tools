@@ -6,5 +6,6 @@ urlpatterns = [
     path('form/', views.form),
     path('generate-csr/', views.generate_csr, name='generate-csr'),
     path('decode-csr/', views.decode_csr, name='decode-csr'),
-    path('verify-ssl/', views.verifySSL, name='verify-ssl')
+    path('verify-ssl/', views.verifySSL, name='verify-ssl'),
+    path('status/', views.get_status, name='status')
 ]
