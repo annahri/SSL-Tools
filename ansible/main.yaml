@@ -5,12 +5,12 @@
   vars:
     python_version: 3.8
     app_path: /srv/apps/ssl-tools/
-    domain_name: ssl-tools.annahri.lan
+    domain_name: "{{ lookup('ansible.builtin.env', 'DOMAIN_NAME') }}"
     envs:
-      - "DEBUG=false"
-      - "ALLOWED_HOSTS={{ domain_name }},127.0.0.1"
-      - "SECRET_KEY=super_secret_key"
-      - "CSRF_TRUSTED_ORIGINS=https://{{ domain_name }}"
+      - "DEBUG={{ lookup('ansible.builtin.env', 'DEBUG') }}"
+      - "ALLOWED_HOSTS={{ lookup('ansible.builtin.env', 'DOMAIN_NAME') }},127.0.0.1"
+      - "SECRET_KEY={{ lookup('ansible.builtin.env', 'DJANGO_SECRET_KEY') }}"
+      - "CSRF_TRUSTED_ORIGINS=https://{{ lookup('ansible.builitin.env', 'DOMAIN_NAME') }}"
 
   tasks:
     - name: Create apps user
