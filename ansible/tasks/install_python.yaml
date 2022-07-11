@@ -11,7 +11,7 @@
 
 - name: Install Python {{ python_version }} (Rocky)
   when: ansible_facts['distribution'] == 'Rocky'
-  ansible.builtin.yum: name=python{{ python_version | split('.') | join('') }} state=present
+  ansible.builtin.yum: name=python{{ python_version | string | split('.') | join('') }} state=present
   become: true
 
 - name: Check if PIP is present
