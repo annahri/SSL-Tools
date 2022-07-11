@@ -6,9 +6,12 @@
   block:
     - name: Make sure Python {{ python_version }} is present
       ansible.builtin.command: which python{{ python_version }}
-      changed_when: false
+      register: pythonver_exists
+      changed_when: pythonver_exists.rc != 0
+      failed_when: false
 
     - include_tasks: install_python.yaml
+      when: pythonver_exists.changed
 
     - name: Install Pipenv
       ansible.builtin.pip:
