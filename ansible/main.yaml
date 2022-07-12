@@ -9,7 +9,7 @@
     envs:
       - "DEBUG={{ lookup('ansible.builtin.env', 'DEBUG') }}"
       - "ALLOWED_HOSTS={{ lookup('ansible.builtin.env', 'DOMAIN_NAME') }},127.0.0.1"
-      - "SECRET_KEY={{ lookup('ansible.builtin.env', 'DJANGO_SECRET_KEY') }}"
+      - "SECRET_KEY={{ lookup('ansible.builtin.env', 'SECRET_KEY') }}"
       - "CSRF_TRUSTED_ORIGINS=https://{{ lookup('ansible.builtin.env', 'DOMAIN_NAME') }}"
 
   tasks:
