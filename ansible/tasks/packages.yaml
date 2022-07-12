@@ -1,7 +1,3 @@
-- name: Update Packages (Ubuntu)
-  when: ansible_facts['distribution'] == "Ubuntu"
-  ansible.builtin.apt: update_cache=yes
-
 - name: Check and Install Python {{ python_version }} if it doesn't exist yet
   block:
     - name: Make sure Python {{ python_version }} is present
@@ -12,6 +8,23 @@
 
     - include_tasks: install_python.yaml
       when: pythonver_exists.changed
+
+    - name: Check if PIP is present # noqa command-instead-of-shell
+      ansible.builtin.shell: command -v pip
+      register: pip_installed
+      failed_when: false
+      changed_when: pip_installed.rc != 0
+
+    - name: Getting get-pip.py # noqa no-handler
+      when: pip_installed.changed
+      ansible.builtin.get_url:
+        url: https://bootstrap.pypa.io/get-pip.py
+        dest: /tmp/get-pip.py
+        mode: 0400
+
+    - name: Installing PIP
+      when: pip_installed.rc != 0
+      ansible.builtin.command: python{{ python_version }} /tmp/get-pip.py
 
     - name: Install Pipenv
       ansible.builtin.pip:

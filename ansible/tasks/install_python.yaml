@@ -4,6 +4,10 @@
   ansible.builtin.apt_repository:
     repo: 'ppa:deadsnakes/ppa'
 
+- name: Update Packages (Ubuntu)
+  when: ansible_facts['distribution'] == "Ubuntu"
+  ansible.builtin.apt: update_cache=yes
+
 - name: Install Python {{ python_version }} (Ubuntu)
   when: ansible_facts['distribution'] == 'Ubuntu'
   ansible.builtin.apt: name=python{{ python_version }}-dev state=present
@@ -13,20 +17,3 @@
   when: ansible_facts['distribution'] == 'Rocky'
   ansible.builtin.yum: name=python{{ python_version | string | split('.') | join('') }} state=present
   become: true
-
-- name: Check if PIP is present # noqa command-instead-of-shell
-  ansible.builtin.shell: command -v pip
-  register: pip_installed
-  failed_when: false
-  changed_when: pip_installed.rc != 0
-
-- name: Getting get-pip.py # noqa no-handler
-  when: pip_installed.changed
-  ansible.builtin.get_url:
-    url: https://bootstrap.pypa.io/get-pip.py
-    dest: /tmp/get-pip.py
-    mode: 0400
-
-- name: Installing PIP
-  when: pip_installed.rc != 0
-  ansible.builtin.command: python{{ python_version }} /tmp/get-pip.py
