@@ -2,7 +2,7 @@
   ansible.posix.synchronize:
     src: ../../ssl-tools/
     dest: "{{ app_path }}"
-    private_key: /privkey
+    private_key: privkey
     rsync_opts:
       - "--chown=apps:apps"
       - "--exclude=.*"
