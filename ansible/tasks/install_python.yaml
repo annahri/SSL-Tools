@@ -14,13 +14,14 @@
   ansible.builtin.yum: name=python{{ python_version | string | split('.') | join('') }} state=present
   become: true
 
-- name: Check if PIP is present
-  ansible.builtin.command: which pip
+- name: Check if PIP is present # noqa command-instead-of-shell
+  ansible.builtin.shell: command -v pip
   register: pip_installed
-  changed_when: false
+  failed_when: false
+  changed_when: pip_installed.rc != 0
 
-- name: Getting get-pip.py
-  when: pip_installed.rc != 0
+- name: Getting get-pip.py # noqa no-handler
+  when: pip_installed.changed
   ansible.builtin.get_url:
     url: https://bootstrap.pypa.io/get-pip.py
     dest: /tmp/get-pip.py
