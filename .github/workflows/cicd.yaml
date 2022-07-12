@@ -58,6 +58,7 @@ jobs:
           DEBUG: false
           DOMAIN_NAME: ssl-tools.ngelinux.my.id
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          SSH_PRIVKEY: ${{ secrets.SSH_PRIVKEY }}
         with:
           directory: ansible/
           playbook: main.yaml
