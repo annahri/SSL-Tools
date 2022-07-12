@@ -38,7 +38,7 @@ jobs:
         run: |
           pipenv install --deploy
 
-      - name: Run tests
+      - name: Run PyTest
         run: |
           pipenv run test -v
 
@@ -58,10 +58,10 @@ jobs:
           DEBUG: false
           DOMAIN_NAME: ssl-tools.ngelinux.my.id
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          LOCAL_IP: 10.1.1.128
         with:
-          playbook: docker_deploy.yaml
           directory: ansible/
+          playbook: main.yaml
+          requirements: requirements.yaml
           key: ${{ secrets.SSH_PRIVKEY }}
           inventory: |
             [all]
