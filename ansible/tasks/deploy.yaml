@@ -37,7 +37,7 @@
   ansible.builtin.systemd:
     name: ssl-tools
     enabled: true
-    state: started
+    state: restarted
 
 - when: ansible_facts['distribution'] == "Ubuntu"
   include_tasks: config_nginx_ubuntu.yaml
