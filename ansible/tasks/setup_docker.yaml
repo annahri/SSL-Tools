@@ -64,17 +64,3 @@
           - containerd.io
           - docker-compose-plugin
         state: present
-
-- name: Add apps user to docker group
-  become: true
-  ansible.builtin.user:
-    name: apps
-    shell: /bin/bash
-    groups: docker
-    append: true
-
-- name: Making sure docker is running
-  become: true
-  ansible.builtin.systemd:
-    name: docker
-    state: started
