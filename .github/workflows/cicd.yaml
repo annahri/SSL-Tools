@@ -52,7 +52,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - run: 'echo "$SSH_KEY" > privkey && chmod 400 privkey && pwd'
+      - name: Create private key
+        id: set_pwd
+        run: |
+          'echo "$SSH_KEY" > privkey && chmod 400 privkey'
+          echo "::set-output name=pwd::$(pwd)"
         shell: bash
         env:
           SSH_KEY: ${{ secrets.SSH_PRIVKEY }}
@@ -63,6 +67,7 @@ jobs:
           DEBUG: false
           DOMAIN_NAME: ssl-tools.ngelinux.my.id
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          PRIVKEY: "${{ steps.set_pwd.outputs.pwd }}/privkey"
         with:
           directory: ansible/
           playbook: main.yaml
