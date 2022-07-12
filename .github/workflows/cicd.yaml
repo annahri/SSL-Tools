@@ -55,7 +55,7 @@ jobs:
       - name: Create private key
         id: set_pwd
         run: |
-          'echo "$SSH_KEY" > privkey && chmod 400 privkey'
+          echo "$SSH_KEY" > privkey && chmod 400 privkey
           echo "::set-output name=pwd::$(pwd)"
         shell: bash
         env:
