@@ -1,7 +1,7 @@
 - name: Check and Install Python {{ python_version }} if it doesn't exist yet
   block:
-    - name: Make sure Python {{ python_version }} is present
-      ansible.builtin.command: which python{{ python_version }}
+    - name: Make sure Python {{ python_version }} is present # noqa command-instead-of-shell
+      ansible.builtin.shell: command -v python{{ python_version }}
       register: pythonver_exists
       changed_when: pythonver_exists.rc != 0
       failed_when: false
