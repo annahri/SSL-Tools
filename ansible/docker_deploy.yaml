@@ -74,8 +74,8 @@
           DEBUG: "false"
           SECRET_KEY: "{{ lookup('ansible.builtin.env', 'DJANGO_SECRET_KEY', default='super_secret_key1234567890') }}"
           ALLOWED_HOSTS: >
-            "{{ lookup('ansible.builtin.env', 'DOMAIN_NAME', default='ssl-tools.annahri.lan') }},127.0.0.1"
-            ",{{ lookup('ansible.builtin.env', 'LOCAL_IP', default='10.1.1.128') }}"
+            "{{ lookup('ansible.builtin.env', 'DOMAIN_NAME', default='ssl-tools.annahri.lan') }},127.0.0.1,
+            {{ lookup('ansible.builtin.env', 'LOCAL_IP', default='10.1.1.128') }}"
           CSRF_TRUSTED_ORIGINS: "{{ lookup('ansible.builtin.env', 'DOMAIN_NAME', default='ssl-tools.annahri.lan') }}"
 
     - name: Test ports
