@@ -5,6 +5,7 @@
   vars:
     python_version: 3.8
     app_path: /srv/apps/ssl-tools/
+    app_port: 8700
     domain_name: "{{ lookup('ansible.builtin.env', 'DOMAIN_NAME') }}"
     envs:
       - "DEBUG={{ lookup('ansible.builtin.env', 'DEBUG') }}"

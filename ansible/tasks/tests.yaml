@@ -1,6 +1,6 @@
 - name: Testing ssl-tools app locally
   ansible.builtin.uri:
-    url: http://127.0.0.1:8000/status
+    url: http://127.0.0.1:{{ app_port }}/status
 
 - name: Testing ssl-tools app publicly
   ansible.builtin.uri:
