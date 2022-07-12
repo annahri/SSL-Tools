@@ -65,11 +65,6 @@
           - docker-compose-plugin
         state: present
 
-- name: Install Docker SDK
-  ansible.builtin.pip:
-    name: docker
-    state: present
-
 - name: Add apps user to docker group
   become: true
   ansible.builtin.user:

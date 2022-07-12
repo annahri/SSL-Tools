@@ -29,6 +29,11 @@
       environment:
         GIT_TERMINAL_PROMP: 0
 
+    - name: Install Docker SDK
+      ansible.builtin.pip:
+        name: docker
+        state: present
+
     - name: Build docker image
       become: true
       become_user: apps
