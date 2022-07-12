@@ -51,6 +51,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - run: 'echo "$SSH_KEY" > /privkey && chmod 400 /privkey'
+        shell: bash
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVKEY }}
       
       - name: Run Ansible
         uses: dawidd6/action-ansible-playbook@v2
@@ -58,7 +63,6 @@ jobs:
           DEBUG: false
           DOMAIN_NAME: ssl-tools.ngelinux.my.id
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          SSH_PRIVKEY: ${{ secrets.SSH_PRIVKEY }}
         with:
           directory: ansible/
           playbook: main.yaml
