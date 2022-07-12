@@ -30,6 +30,7 @@
         GIT_TERMINAL_PROMP: 0
 
     - name: Install Docker SDK
+      become: true
       ansible.builtin.pip:
         name: docker
         state: present
