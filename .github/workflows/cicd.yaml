@@ -59,7 +59,7 @@ jobs:
           DOMAIN_NAME: ssl-tools.ngelinux.my.id
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
         with:
-          playbook: main.yaml
+          playbook: deploy_docker.yaml
           directory: ansible/
           key: ${{ secrets.SSH_PRIVKEY }}
           inventory: |

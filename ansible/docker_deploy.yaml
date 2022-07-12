@@ -1,0 +1,63 @@
+---
+- hosts: all
+  vars:
+    app_port: 8700
+  gather_subset:
+    - distribution
+
+  tasks:
+    - name: Check if docker is installed # noqa command-instead-of-shell
+      register: dockerbin
+      changed_when: dockerbin.rc != 0
+      failed_when: false
+      ansible.builtin.shell:
+        cmd: command -v docker
+
+    - name: Install docker
+      when: dockerbin.rc != 0
+      ansible.builtin.include_tasks: tasks/setup_docker.yaml
+
+    - name: Fetch source code
+      become: true
+      become_user: apps
+      become_method: sudo
+      ansible.builtin.git:
+        repo: https://github.com/annahri/ssl-tools
+        dest: /home/apps/ssl-tools
+        single_branch: true
+        version: main
+      environment:
+        GIT_TERMINAL_PROMP: 0
+
+    - name: Build docker image
+      become: true
+      become_user: apps
+      community.docker.docker_image:
+        name: ssl-tools
+        source: build
+        state: present
+        build:
+          path: /home/apps/ssl-tools
+          args:
+            listen_port: 8000
+
+    - name: Run the docker container
+      become: true
+      become_user: apps
+      community.docker.docker_container:
+        name: ssl-tools
+        image: ssl-tools:latest
+        state: started
+        ports:
+          - "{{ app_port }}:8000"
+        env:
+          DEBUG: "false"
+          SECRET_KEY: "{{ lookup('ansible.builtin.env', 'DJANGO_SECRET_KEY', default='super_secret_key1234567890') }}"
+          ALLOWED_HOSTS: "{{ lookup('ansible.builtin.env', 'DOMAIN_NAME', default='ssl-tools.annahri.lan') }},127.0.0.1"
+          CSRF_TRUSTED_ORIGINS: "{{ lookup('ansible.builtin.env', 'DOMAIN_NAME', default='ssl-tools.annahri.lan') }}"
+
+    - name: Test ports
+      ansible.builtin.uri:
+        url: http://127.0.0.1:{{ app_port }}
+
+# vi: ft=yaml.ansible

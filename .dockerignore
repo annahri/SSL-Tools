@@ -1,0 +1,7 @@
+.*
+**/.*
+
+ansible/
+etc/
+
+README.md

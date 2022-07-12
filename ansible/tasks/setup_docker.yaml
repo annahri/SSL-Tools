@@ -1,0 +1,85 @@
+- name: Setup Docker repo and Install Docker
+  become: true
+  when: ansible_facts['distribution'] == 'Ubuntu'
+  block:
+    - name: Installing required packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+        update_cache: true
+
+    - name: Create keyrings folder
+      ansible.builtin.file:
+        path: /etc/apt/keyrings/
+        state: directory
+        mode: 0755
+
+    - name: Adding Docker's official GPG # noqa command-instead-of-module
+      ansible.builtin.shell:
+        cmd: |
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        creates: /etc/apt/keyrings/docker.gpg
+
+    - name: Setting up repository
+      ansible.builtin.shell:
+        cmd: |
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+                https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
+          | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        creates: /etc/apt/sources.list.d/docker.list
+
+    - name: Install docker
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+        update_cache: true
+
+- name: Install Docker (Rocky)
+  when: ansible_facts['distribution'] == "Rocky"
+  become: true
+  block:
+    - name: Install required packages
+      ansible.builtin.dnf:
+        name: yum-utils
+        state: present
+
+    - name: Setting up repository
+      ansible.builtin.command:
+        cmd: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+        creates: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Install docker
+      ansible.builtin.dnf:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+
+- name: Install Docker SDK
+  ansible.builtin.pip:
+    name: docker
+    state: present
+
+- name: Add apps user to docker group
+  become: true
+  ansible.builtin.user:
+    name: apps
+    shell: /bin/bash
+    groups: docker
+    append: true
+
+- name: Making sure docker is running
+  become: true
+  ansible.builtin.systemd:
+    name: docker
+    state: started

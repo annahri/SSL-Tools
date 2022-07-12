@@ -17,8 +17,6 @@
 - name: Check if PIP is present
   ansible.builtin.command: which pip
   register: pip_installed
-  ignore_errors: true
-  check_mode: false
   changed_when: false
 
 - name: Getting get-pip.py
