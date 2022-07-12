@@ -15,6 +15,7 @@
     rsync_opts:
       - "--chown=apps:apps"
       - "--exclude=.*"
+      - "--exclude=privkey"
       - "--exclude=ansible/"
       - "--exclude=etc/"
 

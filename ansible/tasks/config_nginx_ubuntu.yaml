@@ -35,3 +35,4 @@
   when: nginx_test.rc == 0
   become: true
   ansible.builtin.command: nginx -s reload
+  changed_when: false

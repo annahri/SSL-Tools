@@ -53,10 +53,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Create private key
-        id: set_pwd
+        id: set_path
         run: |
           echo "$SSH_KEY" > privkey && chmod 400 privkey
-          echo "::set-output name=pwd::$(pwd)"
+          echo "::set-output name=privkey_path::$(readlink -f privkey)"
         shell: bash
         env:
           SSH_KEY: ${{ secrets.SSH_PRIVKEY }}
@@ -67,7 +67,7 @@ jobs:
           DEBUG: false
           DOMAIN_NAME: ssl-tools.ngelinux.my.id
           SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          PRIVKEY: "${{ steps.set_pwd.outputs.pwd }}/privkey"
+          PRIVKEY: "${{ steps.set_path.outputs.privkey_path }}"
         with:
           directory: ansible/
           playbook: main.yaml
@@ -76,3 +76,6 @@ jobs:
           inventory: |
             [all]
             app_server ansible_host=${{ secrets.SSH_HOST }} ansible_user=${{ secrets.SSH_USER }}
+
+      - name: Deleting privkey
+        run: rm -f "${{ steps.set_path.outputs.privkey_path }}"
