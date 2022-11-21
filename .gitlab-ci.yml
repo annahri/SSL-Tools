@@ -15,7 +15,8 @@ default:
     - echo "deb http://ppa.launchpad.net/deadsnakes/ppa/ubuntu/ jammy main" > /etc/apt/sources.list.d/deadsnakes-ppa.list
     - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys F23C5A6CF475977595C89F51BA6932366A755776
     - apt -y update
-    - DEBIAN_FRONTEND=noninteractive apt -y install python3.8 python3.8-distutils
+    - DEBIAN_FRONTEND=noninteractive apt -y install python3.8 python3.8-distutils wget
+    - (cd /tmp && wget https://bootstrap.pypa.io/get-pip.py && python3.8 get-pip.py)
     - python3.8 -m pip install pipenv
     - pipenv install --deploy
 
