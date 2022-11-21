@@ -23,7 +23,7 @@ default:
 django-tests:
   stage: test
   script:
-    - pipenv test -v
+    - pipenv run test -v
 
 django-deploy:
   stage: deploy
