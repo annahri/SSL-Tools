@@ -11,7 +11,7 @@ default:
 
   before_script:
     - apt -y update
-    - apt -y install apt-utils
+    - apt -y install apt-utils python3-pip
     - pip install pipenv
     - pipenv install --deploy
 
