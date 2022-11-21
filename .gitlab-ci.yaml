@@ -1,0 +1,29 @@
+variables: []
+
+stages:
+  - test
+  - deploy
+
+default:
+  image: ubuntu:22.04
+  cache:
+    key: ssl-tools
+    paths:
+      - ~/.cache/pip/
+
+  before-script:
+    - apt -y update
+    - apt -y install apt-utils
+    - apt -y install net-tools python3.8 python3-pip
+    - pip install pipenv
+    - pipenv install --deploy
+
+django-tests:
+  stage: test
+  script:
+    - pipenv test -v
+
+django-deploy:
+  stage: deploy
+  script:
+    - echo "Deployment"
