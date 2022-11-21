@@ -11,6 +11,7 @@ default:
 
   before_script:
     - echo "deb http://ppa.launchpad.net/deadsnakes/ppa/ubuntu/ jammy main" > /etc/apt/sources.list.d/deadsnakes-ppa.list
+    - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys F23C5A6CF475977595C89F51BA6932366A755776
     - apt -y update
     - apt -y install apt-utils python3.8 python3-pip
     - pip install pipenv
