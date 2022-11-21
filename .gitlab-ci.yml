@@ -10,10 +10,12 @@ default:
       - ~/.cache/pip/
 
   before_script:
+    - apt install software-properties-common -y
+    - add-apt-repository ppa:deadsnakes/ppa -y    
     - apt -y update
-    - apt -y install apt-utils python3-pip
+    - apt -y install apt-utils python3.8 python3-pip
     - pip install pipenv
-    - pipenv install --deploy
+    - pipenv --python `command -v python3.8` install --deploy
 
 django-tests:
   stage: test
