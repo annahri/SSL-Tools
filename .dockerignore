@@ -4,4 +4,6 @@
 ansible/
 etc/
 
+Pipfile*
+Dockerfile
 README.md

@@ -1,20 +1,28 @@
 stages:
   - test
+  - build
   - deploy
 
 default:
   image: python:3.8-alpine
-
   before_script:
-    - pip install pipenv
-    - pipenv install --deploy
+    - pip install -r requirements.txt
 
-django-tests:
+"Run test":
   stage: test
   script:
-    - pipenv run test -v
+    - pytest -v
 
-django-deploy:
+"Build image":
+  stage: build
+  image: docker:20.10.22
+  services:
+    - docker:20.10.22-dind
+  script:
+    - docker build -t annahri/ssl-tools:1.0 .
+
+"Deploy django":
   stage: deploy
   script:
     - echo "Deployment"
+    - docker images

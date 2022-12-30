@@ -1,24 +1,14 @@
-FROM python:3.8-slim
-
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONDONTWRITEBYTECODE 1
-
-RUN useradd --create-home -U apps 
+FROM python:3.8-alpine as builder
 
 WORKDIR /app/
-COPY --chown=apps:apps . .
+COPY . .
+RUN apk update \
+    && apk add musl-dev linux-headers gcc libffi-dev nginx \
+    && mv default.conf /etc/nginx/http.d/default.conf
 
-RUN pip install pipenv
+RUN sed -i '2i daemon off;' /etc/nginx/nginx.conf
+RUN pip install -r requirements.txt
 
-USER apps:apps
-RUN pipenv install --deploy --clear
-
-WORKDIR /app/src/
-
-EXPOSE 8000
-
-ENTRYPOINT [ "pipenv", "run" ]
-CMD [ "gunicorn", "--bind", "0.0.0.0:8000", "ssl-tools.wsgi" ]
-
-#ENTRYPOINT [ "bash", "-c" ]
-#CMD [ "/app/docker/start.sh" ]
+EXPOSE 80
+ENTRYPOINT [ "/bin/sh", "entrypoint.sh" ]
+CMD ["nginx"]
